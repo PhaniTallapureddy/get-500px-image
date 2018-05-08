@@ -6,16 +6,17 @@
 #	place that downloaded image in to .backup folder
 #
 #	Phani Tallapureddy, Fri Sep 16 18:17:02 IST 2016
+#
+#
+# v1.0  : used wget command
+# v2.0  : used perl LWP module getprint
 
 echo	""
 echo	"**********************************************************************"
 
-echo	"wget -q --no-check-certificate -c 'http://500px.com/photo/$1'"
-wget -q	--no-check-certificate -c "http://500px.com/photo/$1"
-
-set	URL_file	= `ls -1t | grep -v csh | grep -v plx | head -1`
-echo	"perl	process_500px.plx	$URL_file"
-perl	process_500px.plx	$URL_file
+perl -MLWP::Simple -e "getprint 'http://www.500px.com/photo/$1'" > & link.html
+perl  process_500px.plx	link.html
+\rm   link.html
 
 echo	"**********************************************************************"
 echo	""
