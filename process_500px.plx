@@ -79,22 +79,23 @@ $file_type	= $array_type[$#array_type];
 
 ##	get ready with output filename, << pic-number >> . << file_type >>
 $new_file_name	= "$urlfile_in".".$file_type";
+$new_file_name	=~ s/.html//;
 
 ##	last element in the list is the HD-quality
 $link 		= $array_url[$#array_url];
 
 ##	run the actual wget command for specific HD-quality pic link
-system 	("wget", "-q", "--no-check-certificate", "-c", "$link");
+system 	("wget", "-q", " --no-check-certificate ", " -c ", "$link");
 
 ##	downloaded pic will have strange name,
 ##	rename it to pre-configured output filenaming
-$temp_dn_file	= `ls -1t | grep -v csh | grep -v plx | grep -v $urlfile_in | head -1`;
+$temp_dn_file	= `ls -1t | grep -v -P "(html|csh|txt|md|plx)" | head -1`;
 chomp	$temp_dn_file;
-system	("mv", $temp_dn_file, $new_file_name);
+system	("mv", "$temp_dn_file", "$new_file_name");
 
 ##	delete the URL / HTML file
 ##	move the downloaded pic to folder
-system	("rm", $urlfile_in);
+system	("mv", $urlfile_in, ".backup/");
 system	("mv", $new_file_name, ".backup/");
 
 ##	read resolution of the pic downloaded && its size
