@@ -38,6 +38,7 @@ foreach	$line (@array)
 			$temp_key_value =~ 	s/}//g;
 			$temp_key_value =~ 	s/"//g;
 			$temp_key_value =~ 	s/\\//g;
+			$temp_key_value =~ 	s/%3D/=/g;
 
 			if ($temp_key_value =~ m/size/i)
 			{
@@ -81,17 +82,20 @@ $file_type	= $array_type[$#array_type];
 $new_file_name	= "$urlfile_in".".$file_type";
 $new_file_name	=~ s/.html//;
 
+$image_no	= "$urlfile_in";
+$image_no	=~ s/.html//;
+
 ##	last element in the list is the HD-quality
 $link 		= $array_url[$#array_url];
+chomp	$link;
+print	STDOUT	"\n HD pic link -> $link \n";
 
 ##	run the actual wget command for specific HD-quality pic link
-system 	("wget", "-q", " --no-check-certificate ", " -c ", "$link");
+system 	'wget', '-q', '-Otemp_pic', '--no-check-certificate', '-c', "$link";
 
 ##	downloaded pic will have strange name,
 ##	rename it to pre-configured output filenaming
-$temp_dn_file	= `ls -1t | grep -v -P "(html|csh|txt|md|plx)" | head -1`;
-chomp	$temp_dn_file;
-system	("mv", "$temp_dn_file", "$new_file_name");
+system	("mv", "temp_pic", "$new_file_name");
 
 ##	delete the URL / HTML file
 ##	move the downloaded pic to folder
@@ -101,5 +105,15 @@ system	("mv", $new_file_name, ".backup/");
 ##	read resolution of the pic downloaded && its size
 system	("rdjpgcom -verbose .backup/$new_file_name");
 system	("du -sh .backup/$new_file_name");
+
+$image_file_size = -s ".backup/$new_file_name" ;
+##	print	STDOUT	"\n $new_file_name file-size is : $image_file_size \n";
+
+## image file size is less than 40KB, then delete that
+if ($image_file_size < 40000)
+{
+	print	STDOUT	"\n no image in -> $urlfile_in \n";
+	system ("rm .backup/$image_no\*");
+}
 
 
